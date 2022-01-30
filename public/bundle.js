@@ -7493,14 +7493,15 @@ exports.cleanHeader = function (header, changesOrigin) {
 };
 
 },{}],51:[function(require,module,exports){
+(function (process){(function (){
 const SpotifyWebApi = require('spotify-web-api-node')
 const axios = require('axios')
 
 let accessToken, refreshToken, expiresIn
 
 const spotifyApi = new SpotifyWebApi({
-    clientId: "19fb730b06934300af7ce6a4c9162ed5",
-  })
+    clientId: process.env.CLIENT_ID,
+})
 
 const code = new URLSearchParams(window.location.search).get('code')
 const d = document.getElementById("loggedin")
@@ -7550,4 +7551,5 @@ getButton.addEventListener("click", () => {
   });
 })
 
-},{"axios":2,"spotify-web-api-node":40}]},{},[51]);
+}).call(this)}).call(this,require('_process'))
+},{"_process":1,"axios":2,"spotify-web-api-node":40}]},{},[51]);
