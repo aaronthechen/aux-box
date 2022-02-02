@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +13,13 @@
         </a>
     </div>
     <div id='loggedin'>
-        <button id='deal'>show your favorite song</button>
+        <form action="/room" method="post">
+            <button id='createroom'>create game</button>
+        </form>
+        <form id="join">
+            <input name="room" type="text" required>
+            <button type="submit">join room</button>
+          </form>
     </div>
 </body>
 <script src="bundle.js"></script>

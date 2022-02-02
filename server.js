@@ -13,6 +13,10 @@ const spotifyApi = new SpotifyWebApi({
   clientSecret: process.env.CLIENT_SECRET,
 })
 
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+app.set('view engine', 'ejs')
+
 app.use(express.static(path.join(__dirname, "public")))
 app.use(cors())
 app.use(express.json()) //For JSON requests
@@ -20,13 +24,35 @@ app.use(express.urlencoded({extended: true}));
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 
+const rooms = {name: {}}
+
+app.get("/", (req, res) => {
+  res.render("index")
+})
+
+app.post('/room', (req, res) => {
+  let roomID = ""
+  do {
+    roomID = generateRoomID()
+  }
+  while (rooms[roomID] != null)
+
+  rooms[roomID] = { users: {} }
+  res.redirect(roomID)
+})
+
+app.get('/:room', (req, res) => {
+  if (rooms[req.params.room] == null) {
+    return res.redirect('/')
+  }
+  res.render("room")
+})
+
 app.post("/login", (req, res) => {
     const code = req.body.code
     spotifyApi
     .authorizationCodeGrant(code)
       .then(data => {
-        spotifyApi.setRefreshToken(data.body.refresh_token)
-        spotifyApi.setAccessToken(data.body.access_token)
         res.json({
           accessToken: data.body.access_token,
           refreshToken: data.body.refresh_token,
@@ -40,6 +66,7 @@ app.post("/login", (req, res) => {
 })
 
 app.post("/refresh", (req, res) => {
+  spotifyApi.setRefreshToken(req.body.refreshToken)
   spotifyApi
     .refreshAccessToken()
     .then(data => {
@@ -53,3 +80,11 @@ app.post("/refresh", (req, res) => {
       res.sendStatus(400)
     })
 })
+
+function generateRoomID() {
+  let roomID = ""
+  while(roomID.length < 5) {
+    roomID+=ALPHABET[Math.floor(Math.random() * 26)];
+  }
+  return roomID
+}

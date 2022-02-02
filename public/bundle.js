@@ -7497,7 +7497,7 @@ exports.cleanHeader = function (header, changesOrigin) {
 const SpotifyWebApi = require('spotify-web-api-node')
 const axios = require('axios')
 
-let accessToken, refreshToken, expiresIn
+let accessToken, refreshToken, expiresIn, roomID
 
 const spotifyApi = new SpotifyWebApi({
     clientId: process.env.CLIENT_ID,
@@ -7506,7 +7506,6 @@ const spotifyApi = new SpotifyWebApi({
 const code = new URLSearchParams(window.location.search).get('code')
 const d = document.getElementById("loggedin")
 const l = document.getElementById("login")
-const getButton = document.getElementById("deal")
 
 if(code != null) {
     showDisplay()
@@ -7532,7 +7531,9 @@ function showDisplay() {
 }
 
 function getRefresh() {
-    axios.post("/refresh", code)
+    axios.post("/refresh", {
+        refreshToken,
+    })
     .then(res => {
         accessToken = res.data.accessToken
         expiresIn = res.data.expiresIn
@@ -7541,14 +7542,12 @@ function getRefresh() {
     })
 }
 
-getButton.addEventListener("click", () => {
-    spotifyApi.getMyTopTracks()
-  .then(function(data) {
-    let topTracks = data.body.items[0].name;
-    console.log(topTracks)
-  }, function(err) {
-    console.log('Something went wrong!', err);
-  });
+document.getElementById("join").addEventListener("submit", function (e) {
+    e.preventDefault()
+    
+    let param = document.querySelector('input[name="room"]').value
+
+    window.location = param
 })
 
 }).call(this)}).call(this,require('_process'))
