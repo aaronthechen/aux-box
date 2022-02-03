@@ -7507,14 +7507,16 @@ const code = new URLSearchParams(window.location.search).get('code')
 const d = document.getElementById("loggedin")
 const l = document.getElementById("login")
 
-if(code != null) {
+if('refreshToken' in localStorage) {
+    refreshToken = localStorage.getItem('refreshToken')
+    getRefresh()
     showDisplay()
 }
+else if(code != null) {
+    login()
+}
 
-function showDisplay() {
-    d.style.display = 'block'
-    l.style.display = 'none'
-
+function login() {
     axios.post("/login", {
         code,
     })
@@ -7522,12 +7524,22 @@ function showDisplay() {
         accessToken = res.data.accessToken
         refreshToken = res.data.refreshToken
         expiresIn = res.data.expiresIn
-        setInterval(getRefresh, (expiresIn-10)*1000)
+
+        localStorage.setItem('refreshToken', refreshToken)
+
         spotifyApi.setAccessToken(accessToken)
+
         window.history.pushState({}, null, '/')
     }).catch(() => {
         window.location = "/"
     })
+    showDisplay()
+}
+
+function showDisplay() {
+    d.style.display = 'block'
+    l.style.display = 'none'
+    setInterval(getRefresh, (3600-10)*1000)
 }
 
 function getRefresh() {
@@ -7537,8 +7549,11 @@ function getRefresh() {
     .then(res => {
         accessToken = res.data.accessToken
         expiresIn = res.data.expiresIn
-    }).catch(() => {
+
+        spotifyApi.setAccessToken(accessToken)
+    }).catch((err) => {
         window.location = "/"
+        console.log(err)
     })
 }
 
@@ -7548,6 +7563,11 @@ document.getElementById("join").addEventListener("submit", function (e) {
     let param = document.querySelector('input[name="room"]').value
 
     window.location = param
+})
+
+document.getElementById("logout").addEventListener("click", () => {
+    localStorage.clear()
+    window.location = "/"
 })
 
 }).call(this)}).call(this,require('_process'))
