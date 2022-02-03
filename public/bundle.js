@@ -7562,7 +7562,7 @@ document.getElementById("join").addEventListener("submit", function (e) {
     
     let param = document.querySelector('input[name="room"]').value
 
-    window.location = param
+    window.location = param.toUpperCase()
 })
 
 document.getElementById("logout").addEventListener("click", () => {
