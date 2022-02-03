@@ -3,9 +3,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <title>AuxBox</title>
 </head>
 <body>
-    <h1>HEEHEE</h1>
+    <div id="roomlogin">
+        <a class="btn" href="https://accounts.spotify.com/authorize?client_id=19fb730b06934300af7ce6a4c9162ed5&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read">
+            <button>Login With Spotify</button>
+        </a>
+    </div>
+    <div id="roomloggedin"></div>
 </body>
+<script src="bundle.js"></script>
 </html>

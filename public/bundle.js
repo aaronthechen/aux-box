@@ -7499,6 +7499,7 @@ const axios = require('axios')
 
 let accessToken, refreshToken, expiresIn, roomID
 
+const socket = io()
 const spotifyApi = new SpotifyWebApi({
     clientId: process.env.CLIENT_ID,
 })
@@ -7506,11 +7507,13 @@ const spotifyApi = new SpotifyWebApi({
 const code = new URLSearchParams(window.location.search).get('code')
 const d = document.getElementById("loggedin")
 const l = document.getElementById("login")
+const rl = document.getElementById("roomlogin")
 
 if('refreshToken' in localStorage) {
     refreshToken = localStorage.getItem('refreshToken')
     getRefresh()
     showDisplay()
+
 }
 else if(code != null) {
     login()
@@ -7561,8 +7564,11 @@ document.getElementById("join").addEventListener("submit", function (e) {
     e.preventDefault()
     
     let param = document.querySelector('input[name="room"]').value
-
+    
     window.location = param.toUpperCase()
+
+    roomID = window.location.pathname
+    console.log(roomID)
 })
 
 document.getElementById("logout").addEventListener("click", () => {

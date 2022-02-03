@@ -9,6 +9,20 @@
 #loggedin {
   display: none;
 }
+
+#roomlogin {
+  width: 100%;
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  text-align: center;
+}
+
+#roomloggedin {
+  display: none;
+}
+
+
 .text-overflow {
   overflow: hidden;
   text-overflow: ellipsis;

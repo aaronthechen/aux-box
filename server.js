@@ -4,6 +4,7 @@ require('dotenv').config({ path: "./.env" });
 const PORT = process.env.PORT || 3000
 const app = express()
 const server = require('http').createServer(app)
+const io = require('socket.io')(server)
 const cors = require('cors')
 const SpotifyWebApi = require('spotify-web-api-node')
 
@@ -24,7 +25,7 @@ app.use(express.urlencoded({extended: true}));
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 
-const rooms = {name: {}}
+const rooms = {}
 
 app.get("/", (req, res) => {
   res.render("index")
@@ -79,6 +80,10 @@ app.post("/refresh", (req, res) => {
       console.log(err)
       res.sendStatus(400)
     })
+})
+
+io.on('connection', socket => {
+  console.log(socket.id)
 })
 
 function generateRoomID() {

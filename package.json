@@ -9,6 +9,7 @@
     "dotenv": "^14.3.2",
     "ejs": "^3.1.6",
     "express": "^4.17.2",
+    "socket.io": "^4.4.1",
     "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
