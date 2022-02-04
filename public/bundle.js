@@ -7505,6 +7505,10 @@ const spotifyApi = new SpotifyWebApi({
 })
 
 const code = new URLSearchParams(window.location.search).get('code')
+roomID = window.location.pathname.substring(1,)
+if(roomID) {
+    localStorage.setItem('roomID', roomID)
+}
 const d = document.getElementById("loggedin")
 const l = document.getElementById("login")
 const rl = document.getElementById("roomlogin")
@@ -7513,8 +7517,8 @@ if('refreshToken' in localStorage) {
     refreshToken = localStorage.getItem('refreshToken')
     getRefresh()
     showDisplay()
-
 }
+
 else if(code != null) {
     login()
 }
@@ -7531,8 +7535,13 @@ function login() {
         localStorage.setItem('refreshToken', refreshToken)
 
         spotifyApi.setAccessToken(accessToken)
-
+        
         window.history.pushState({}, null, '/')
+
+        if(localStorage.getItem('roomID')) {
+            roomID = localStorage.getItem('roomID')
+            window.location = roomID
+        }
     }).catch(() => {
         window.location = "/"
     })
@@ -7540,8 +7549,13 @@ function login() {
 }
 
 function showDisplay() {
-    d.style.display = 'block'
-    l.style.display = 'none'
+    if(roomID) {
+        rl.style.display = 'none'
+    }
+    else {
+        d.style.display = 'block'
+        l.style.display = 'none'
+    }
     setInterval(getRefresh, (3600-10)*1000)
 }
 
@@ -7560,21 +7574,32 @@ function getRefresh() {
     })
 }
 
-document.getElementById("join").addEventListener("submit", function (e) {
-    e.preventDefault()
+if(!roomID) {
+    document.getElementById("join").addEventListener("submit", function (e) {
+        e.preventDefault()
+        
+        let param = document.querySelector('input[name="room"]').value
+        
+        window.location = param.toUpperCase()
+    })
     
-    let param = document.querySelector('input[name="room"]').value
-    
-    window.location = param.toUpperCase()
+    document.getElementById("logout").addEventListener("click", () => {
+        localStorage.clear()
+        window.location = "/"
+    })
+}
+else {
+    document.getElementById("loginroom").addEventListener("click", () => {
 
-    roomID = window.location.pathname
-    console.log(roomID)
-})
+    })
+}
 
-document.getElementById("logout").addEventListener("click", () => {
-    localStorage.clear()
-    window.location = "/"
-})
-
+(function () {
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    };
+})();
 }).call(this)}).call(this,require('_process'))
 },{"_process":1,"axios":2,"spotify-web-api-node":40}]},{},[51]);
