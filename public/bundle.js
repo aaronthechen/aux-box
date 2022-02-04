@@ -7599,6 +7599,9 @@ else {
         
         socket.emit('message', roomID, message)
     })
+    document.getElementById("leaveroom").addEventListener("click", () => {
+        window.location = "/"
+    })
 }
 
 (function () {
