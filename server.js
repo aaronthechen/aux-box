@@ -36,7 +36,7 @@ app.post('/room', (req, res) => {
   do {
     roomID = generateRoomID()
   }
-  while (rooms[roomID] != null)
+  while (rooms[roomID] != null && rooms[roomID].users.length>0)
 
   rooms[roomID] = { users: {} }
   res.redirect(roomID)
@@ -83,8 +83,30 @@ app.post("/refresh", (req, res) => {
 })
 
 io.on('connection', socket => {
-  console.log(socket.id)
+  socket.on('userconnect', (room, name) => {
+    socket.join(room) 
+    name += " "+(Object.keys(rooms[room].users).length+1)
+    rooms[room].users[socket.id] = name
+    console.log(name+" connected")
+    io.sockets.to(room).emit('playerconnect', name)
+  })
+  socket.on('message', (room, message) => {
+    console.log(rooms[room].users[socket.id]+": "+message)
+  })
+  socket.on('disconnect', () => {
+    getUserRooms(socket).forEach(room => {
+      io.sockets.to(room).emit('playerdisconnect', rooms[room].users[socket.id])
+      delete rooms[room].users[socket.id]
+    })
+  })
 })
+
+function getUserRooms(socket) {
+  return Object.entries(rooms).reduce((names, [name, room]) => {
+    if (room.users[socket.id] != null) names.push(name)
+    return names
+  }, [])
+}
 
 function generateRoomID() {
   let roomID = ""

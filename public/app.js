@@ -13,9 +13,6 @@ roomID = window.location.pathname.substring(1,)
 if(roomID) {
     localStorage.setItem('roomID', roomID)
 }
-const d = document.getElementById("loggedin")
-const l = document.getElementById("login")
-const rl = document.getElementById("roomlogin")
 
 if('refreshToken' in localStorage) {
     refreshToken = localStorage.getItem('refreshToken')
@@ -54,11 +51,16 @@ function login() {
 
 function showDisplay() {
     if(roomID) {
-        rl.style.display = 'none'
+        document.getElementById("roomloggedin").style.display = 'block'
+        document.getElementById("roomlogin").style.display = 'none'
+        socket.emit('userconnect', roomID, "player")
+        socket.on('playerconnect', (name) => {
+            console.log(name)
+        })
     }
     else {
-        d.style.display = 'block'
-        l.style.display = 'none'
+        document.getElementById("loggedin").style.display = 'block'
+        document.getElementById("login").style.display = 'none'
     }
     setInterval(getRefresh, (3600-10)*1000)
 }
@@ -93,8 +95,13 @@ if(!roomID) {
     })
 }
 else {
-    document.getElementById("loginroom").addEventListener("click", () => {
-
+    document.getElementById("message").addEventListener("submit", function (e) {
+        e.preventDefault()
+        
+        let message = document.querySelector('input[name="message"]').value
+        document.querySelector('input[name="message"]').value=''
+        
+        socket.emit('message', roomID, message)
     })
 }
 
