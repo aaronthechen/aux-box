@@ -26,6 +26,7 @@ app.use(express.urlencoded({extended: true}));
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 
 const rooms = {}
+const ingame = {}
 
 app.get("/", (req, res) => {
   res.render("index")
@@ -87,10 +88,14 @@ io.on('connection', socket => {
     socket.join(room) 
     name += " "+(Object.keys(rooms[room].users).length+1)
     rooms[room].users[socket.id] = name
+    ingame[socket.id] = true;
     console.log(name+" connected")
+    console.log(ingame[socket.id])
     io.sockets.to(room).emit('playerconnect', name)
   })
   socket.on('message', (room, message) => {
+    ingame[socket.id] = false
+    console.log(ingame[socket.id])
     console.log(rooms[room].users[socket.id]+": "+message)
   })
   socket.on('disconnect', () => {
@@ -98,6 +103,7 @@ io.on('connection', socket => {
       io.sockets.to(room).emit('playerdisconnect', rooms[room].users[socket.id])
       delete rooms[room].users[socket.id]
     })
+    delete ingame[socket.id]
   })
 })
 

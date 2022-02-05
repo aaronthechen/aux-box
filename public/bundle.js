@@ -7506,17 +7506,17 @@ const spotifyApi = new SpotifyWebApi({
 
 const code = new URLSearchParams(window.location.search).get('code')
 roomID = window.location.pathname.substring(1,)
-if(roomID) {
+if (roomID) {
     localStorage.setItem('roomID', roomID)
 }
 
-if('refreshToken' in localStorage) {
+if ('refreshToken' in localStorage) {
     refreshToken = localStorage.getItem('refreshToken')
     getRefresh()
     showDisplay()
 }
 
-else if(code != null) {
+else if (code != null) {
     login()
 }
 
@@ -7524,29 +7524,29 @@ function login() {
     axios.post("/login", {
         code,
     })
-    .then(res => {
-        accessToken = res.data.accessToken
-        refreshToken = res.data.refreshToken
-        expiresIn = res.data.expiresIn
+        .then(res => {
+            accessToken = res.data.accessToken
+            refreshToken = res.data.refreshToken
+            expiresIn = res.data.expiresIn
 
-        localStorage.setItem('refreshToken', refreshToken)
+            localStorage.setItem('refreshToken', refreshToken)
 
-        spotifyApi.setAccessToken(accessToken)
-        
-        window.history.pushState({}, null, '/')
+            spotifyApi.setAccessToken(accessToken)
 
-        if(localStorage.getItem('roomID')) {
-            roomID = localStorage.getItem('roomID')
-            window.location = roomID
-        }
-    }).catch(() => {
-        window.location = "/"
-    })
+            window.history.pushState({}, null, '/')
+
+            if (localStorage.getItem('roomID')) {
+                roomID = localStorage.getItem('roomID')
+                window.location = roomID
+            }
+        }).catch(() => {
+            window.location = "/"
+        })
     showDisplay()
 }
 
 function showDisplay() {
-    if(roomID) {
+    if (roomID) {
         document.getElementById("roomloggedin").style.display = 'block'
         document.getElementById("roomlogin").style.display = 'none'
         socket.emit('userconnect', roomID, "player")
@@ -7558,33 +7558,33 @@ function showDisplay() {
         document.getElementById("loggedin").style.display = 'block'
         document.getElementById("login").style.display = 'none'
     }
-    setInterval(getRefresh, (3600-10)*1000)
+    setInterval(getRefresh, (3600 - 10) * 1000)
 }
 
 function getRefresh() {
     axios.post("/refresh", {
         refreshToken,
     })
-    .then(res => {
-        accessToken = res.data.accessToken
-        expiresIn = res.data.expiresIn
+        .then(res => {
+            accessToken = res.data.accessToken
+            expiresIn = res.data.expiresIn
 
-        spotifyApi.setAccessToken(accessToken)
-    }).catch((err) => {
-        window.location = "/"
-        console.log(err)
-    })
+            spotifyApi.setAccessToken(accessToken)
+        }).catch((err) => {
+            window.location = "/"
+            console.log(err)
+        })
 }
 
-if(!roomID) {
+if (!roomID) {
     document.getElementById("join").addEventListener("submit", function (e) {
         e.preventDefault()
-        
+
         let param = document.querySelector('input[name="room"]').value
-        
+
         window.location = param.toUpperCase()
     })
-    
+
     document.getElementById("logout").addEventListener("click", () => {
         localStorage.clear()
         window.location = "/"
@@ -7593,19 +7593,46 @@ if(!roomID) {
 else {
     document.getElementById("message").addEventListener("submit", function (e) {
         e.preventDefault()
-        
+
         let message = document.querySelector('input[name="message"]').value
-        document.querySelector('input[name="message"]').value=''
-        
+        document.querySelector('input[name="message"]').value = ''
+
         socket.emit('message', roomID, message)
     })
     document.getElementById("leaveroom").addEventListener("click", () => {
         window.location = "/"
     })
+
+    function debounce(callback, wait) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(function () { callback.apply(this, args); }, wait);
+        };
+    }
+
+    document.getElementById("search").addEventListener('keyup', debounce(() => {
+        let search = document.getElementById("search").value
+        if (search) {
+            spotifyApi.searchTracks(search).then(res => {
+                document.getElementById('results').innerHTML = ""
+                res.body.tracks.items.forEach(track => {
+                    const iframe = document.createElement('iframe')
+                    iframe.setAttribute('src', "https://open.spotify.com/embed/track/"+track.id+"?utm_source=generator&theme=0")
+                    iframe.setAttribute('height', "80")
+                    iframe.setAttribute('frameBorder', "0")
+                    document.getElementById('results').appendChild(iframe)
+                })
+            })
+        }
+        else {
+            document.getElementById('results').innerHTML = ""
+        }
+    }, 300))
 }
 
 (function () {
-    window.onpageshow = function(event) {
+    window.onpageshow = function (event) {
         if (event.persisted) {
             window.location.reload();
         }
