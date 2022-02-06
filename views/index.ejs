@@ -8,11 +8,6 @@
     <title>AuxBox</title>
 </head>
 <body>
-    <div id="login">
-        <a class="btn" href="https://accounts.spotify.com/authorize?client_id=19fb730b06934300af7ce6a4c9162ed5&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read">
-            <button>Login With Spotify</button>
-        </a>
-    </div>
     <div id='loggedin'>
         <form action="/room" method="post">
             <button id='createroom'>create game</button>
@@ -21,7 +16,6 @@
             <input name="room" autocomplete="off" type="text" required>
             <button type="submit">join room</button>
           </form>
-        <button id="logout">Logout</button>
     </div>
 </body>
 <script src="bundle.js"></script>

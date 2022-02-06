@@ -1,84 +1,26 @@
 const SpotifyWebApi = require('spotify-web-api-node')
 const axios = require('axios')
 
-let accessToken, refreshToken, expiresIn, roomID
+let roomID
 
 const socket = io()
+
 const spotifyApi = new SpotifyWebApi({
     clientId: process.env.CLIENT_ID,
 })
 
-const code = new URLSearchParams(window.location.search).get('code')
-roomID = window.location.pathname.substring(1,)
-if (roomID) {
-    localStorage.setItem('roomID', roomID)
-}
+getAccessToken()
 
-if ('refreshToken' in localStorage) {
-    refreshToken = localStorage.getItem('refreshToken')
-    getRefresh()
-    showDisplay()
-}
-
-else if (code != null) {
-    login()
-}
-
-function login() {
-    axios.post("/login", {
-        code,
-    })
+function getAccessToken() {
+    axios.get('/access')
         .then(res => {
-            accessToken = res.data.accessToken
-            refreshToken = res.data.refreshToken
-            expiresIn = res.data.expiresIn
-
-            localStorage.setItem('refreshToken', refreshToken)
-
-            spotifyApi.setAccessToken(accessToken)
-
-            window.history.pushState({}, null, '/')
-
-            if (localStorage.getItem('roomID')) {
-                roomID = localStorage.getItem('roomID')
-                window.location = roomID
-            }
-        }).catch(() => {
-            window.location = "/"
-        })
-    showDisplay()
-}
-
-function showDisplay() {
-    if (roomID) {
-        document.getElementById("roomloggedin").style.display = 'block'
-        document.getElementById("roomlogin").style.display = 'none'
-        socket.emit('userconnect', roomID, "player")
-        socket.on('playerconnect', (name) => {
-            console.log(name)
-        })
-    }
-    else {
-        document.getElementById("loggedin").style.display = 'block'
-        document.getElementById("login").style.display = 'none'
-    }
-    setInterval(getRefresh, (3600 - 10) * 1000)
-}
-
-function getRefresh() {
-    axios.post("/refresh", {
-        refreshToken,
-    })
-        .then(res => {
-            accessToken = res.data.accessToken
-            expiresIn = res.data.expiresIn
-
-            spotifyApi.setAccessToken(accessToken)
+            spotifyApi.setAccessToken(res.data.accessToken)
         }).catch((err) => {
-            window.location = "/"
             console.log(err)
         })
 }
+
+roomID = window.location.pathname.substring(1,)
 
 if (!roomID) {
     document.getElementById("join").addEventListener("submit", function (e) {
@@ -88,23 +30,22 @@ if (!roomID) {
 
         window.location = param.toUpperCase()
     })
-
-    document.getElementById("logout").addEventListener("click", () => {
-        localStorage.clear()
-        window.location = "/"
-    })
 }
 else {
-    document.getElementById("message").addEventListener("submit", function (e) {
-        e.preventDefault()
+    socket.emit('userconnect', roomID, "player")
 
-        let message = document.querySelector('input[name="message"]').value
-        document.querySelector('input[name="message"]').value = ''
-
-        socket.emit('message', roomID, message)
+    socket.on('playerconnect', (name) => {
+        console.log(name)
     })
-    document.getElementById("leaveroom").addEventListener("click", () => {
-        window.location = "/"
+
+    socket.on('addtrack', (id) => {
+        const iframe = document.createElement('iframe')
+        iframe.setAttribute('src', "https://open.spotify.com/embed/track/" + id + "?utm_source=generator&theme=0")
+        iframe.setAttribute('height', "80")
+        iframe.setAttribute('width', "100%")
+        iframe.setAttribute('allow', "clipboard-write; encrypted-media")
+        iframe.setAttribute('frameBorder', "0")
+        document.getElementById('show').appendChild(iframe)
     })
 
     function debounce(callback, wait) {
@@ -118,21 +59,44 @@ else {
     document.getElementById("search").addEventListener('keyup', debounce(() => {
         let search = document.getElementById("search").value
         if (search) {
+            document.getElementById('show').style.display = 'none'
+            getAccessToken()
             spotifyApi.searchTracks(search).then(res => {
                 document.getElementById('results').innerHTML = ""
                 res.body.tracks.items.forEach(track => {
-                    const iframe = document.createElement('iframe')
-                    iframe.setAttribute('src', "https://open.spotify.com/embed/track/"+track.id+"?utm_source=generator&theme=0")
-                    iframe.setAttribute('height', "80")
-                    iframe.setAttribute('frameBorder', "0")
-                    document.getElementById('results').appendChild(iframe)
+                    const template = document.querySelector('#r')
+                    const result = template.content.cloneNode(true)
+                    result.querySelector('img').src = track.album.images[2].url
+                    result.querySelector('h3').innerHTML = track.name
+                    result.querySelector('.song').onclick = () => {
+                        socket.emit('puttrack', roomID, track.id)
+                        document.getElementById('results').innerHTML = ""
+                        document.getElementById("search").value = ''
+                        document.getElementById('show').style.display = 'block'
+                    }
+                    document.getElementById('results').appendChild(result)
                 })
+            }).catch(err => {
+                console.log(err)
             })
         }
         else {
             document.getElementById('results').innerHTML = ""
         }
-    }, 300))
+    }, 50))
+
+    document.getElementById("message").addEventListener("submit", function (e) {
+        e.preventDefault()
+
+        let message = document.querySelector('input[name="message"]').value
+        document.querySelector('input[name="message"]').value = ''
+
+        socket.emit('message', roomID, message)
+    })
+
+    document.getElementById("leaveroom").addEventListener("click", () => {
+        window.location = "/"
+    })
 }
 
 (function () {

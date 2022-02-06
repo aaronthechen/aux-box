@@ -9,7 +9,6 @@ const cors = require('cors')
 const SpotifyWebApi = require('spotify-web-api-node')
 
 const spotifyApi = new SpotifyWebApi({
-  redirectUri: process.env.REDIRECT_URI,
   clientId: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
 })
@@ -27,6 +26,29 @@ server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 
 const rooms = {}
 const ingame = {}
+let access_token
+
+newToken();
+
+function newToken(){
+  spotifyApi
+  .clientCredentialsGrant()
+    .then(data => {
+      access_token = data.body.access_token
+        spotifyApi.setAccessToken(access_token)
+    }
+  ).catch(err => {
+    console.log(err)
+  })
+}
+
+setInterval(newToken, (3600 - 10) * 1000);
+
+app.get('/access', (req, res) => {
+  res.json({
+    accessToken: access_token
+  })
+})
 
 app.get("/", (req, res) => {
   res.render("index")
@@ -50,39 +72,6 @@ app.get('/:room', (req, res) => {
   res.render("room")
 })
 
-app.post("/login", (req, res) => {
-    const code = req.body.code
-    spotifyApi
-    .authorizationCodeGrant(code)
-      .then(data => {
-        res.json({
-          accessToken: data.body.access_token,
-          refreshToken: data.body.refresh_token,
-          expiresIn: data.body.expires_in,
-        })
-      })
-      .catch(err => {
-        console.log(err)
-        res.sendStatus(400)
-      })
-})
-
-app.post("/refresh", (req, res) => {
-  spotifyApi.setRefreshToken(req.body.refreshToken)
-  spotifyApi
-    .refreshAccessToken()
-    .then(data => {
-      res.json({
-        accessToken: data.body.access_token,
-        expiresIn: data.body.expires_in,
-      })
-    })
-    .catch(err => {
-      console.log(err)
-      res.sendStatus(400)
-    })
-})
-
 io.on('connection', socket => {
   socket.on('userconnect', (room, name) => {
     socket.join(room) 
@@ -93,11 +82,17 @@ io.on('connection', socket => {
     console.log(ingame[socket.id])
     io.sockets.to(room).emit('playerconnect', name)
   })
+
   socket.on('message', (room, message) => {
     ingame[socket.id] = false
     console.log(ingame[socket.id])
     console.log(rooms[room].users[socket.id]+": "+message)
   })
+
+  socket.on('puttrack', (room, id) => {
+    io.sockets.to(room).emit('addtrack', id)
+  })
+
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(room => {
       io.sockets.to(room).emit('playerdisconnect', rooms[room].users[socket.id])

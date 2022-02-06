@@ -10,20 +10,27 @@
 </head>
 
 <body>
-    <div id="roomlogin">
-        <a class="btn"
-            href="https://accounts.spotify.com/authorize?client_id=19fb730b06934300af7ce6a4c9162ed5&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read">
-            <button>Login With Spotify</button>
-        </a>
-    </div>
+    <template id="r">
+        <div class='song' onclick="">
+            <img src="" alt="image">
+            <div id="title">
+                <h3>here</h3>
+            </div>
+        </div>
+    </template>
+
     <div id="roomloggedin">
+        <div id="searchbox">
+            <input type="text" id="search" placeholder="Search for a track.." autocomplete="off">
+            <div id="results">
+            </div>
+        </div>
+        <div id="show">
+        </div>
         <form id="message">
             <input name="message" autocomplete="off" type="text" required>
             <button type="submit">send</button>
         </form>
-        <input type="text" id="search" placeholder="Search for names..">
-        <div id="results">
-        </div>
         <button id="leaveroom">leave</button>
     </div>
 </body>
