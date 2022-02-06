@@ -1,3 +1,8 @@
+* {
+  font-size: 100%;
+  font-family: 'Poppins', sans-serif;
+}
+
 body {
   margin: 0;
 }
@@ -10,16 +15,25 @@ body {
 }
 
 #roomloggedin {
-  width: 100%;
-  position: absolute;
+  width: 50%;
+  margin: 0 auto;
   text-align: center;
-  justify-content: space-between;
+  justify-content: center;
+}
+
+#search {
+  width: 100%;
+  height: 5%;
 }
 
 .song {
   position: left;
   display: flex;
   cursor: pointer;
+}
+
+.song:hover {
+  background-color: lightgray;
 }
 
 img{
