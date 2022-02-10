@@ -7579,7 +7579,7 @@ else {
         else {
             document.getElementById('results').innerHTML = ""
         }
-    }, 50))
+    }, 100))
 
     document.getElementById("message").addEventListener("submit", function (e) {
         e.preventDefault()
