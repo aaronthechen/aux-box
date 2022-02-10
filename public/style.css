@@ -1,69 +1,83 @@
+:root {
+  --light-green: #c7f9cc;
+  --mint-green: #80ed99;
+  --neutral-green: #57cc99;
+  --navy: #457595;
+  --teal-light: #356585;
+  --teal: #22577a;
+}
+
 * {
   font-size: 100%;
   font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--teal);
 }
-#loggedin {
-  width: 100%;
-  position: absolute;
-  z-index: 2;
-  top: 50%;
+
+.title-large {
+  font-size: 3rem;
+  color: white;
+  width: 60vw;
   text-align: center;
+  margin: 2rem;
 }
 
 .container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem;
 }
 
-#playerlist {
-  flex: 1 1 auto;
-  min-height: 100px;
-  min-width: 70px;
-  position: relative;
+.block {
+  width: 50vw;
+  padding: 1rem;
+  margin: 0.4rem;
 }
 
-#messages {
-  flex: 1 1 auto;
-  min-height: 100px;
-  min-width: 70px;
-  position: relative;
+.button {
+  border: none;
+  outline: none;
+  background: var(--teal-light);
+  color: white;
+  border-radius: 1rem;
+  transition: 0.3s;
 }
 
-#searchbox {
-  flex: 1 1 auto;
-  min-width: 300px;
-  position: relative;
-  margin: 0;
-  line-height: 0;
-}
-
-#search {
-  width: 100%;
-}
-
-.song {
-  position: left;
-  display: flex;
+.button:hover {
+  background: var(--navy);
   cursor: pointer;
 }
 
-.song:hover {
-  background-color: lightgray;
+.input {
+  border: none;
+  outline: none;
+  background: var(--teal-light);
+  color: transparent;
+  text-shadow: 0 0 0 white;
+  border-radius: 1rem;
+  text-align: center;
+  transition: ease 0.5s;
 }
 
-img{
-  display: block;
-  align-self: center;
+.input:focus {
+  background: var(--navy);
 }
 
-.text-overflow {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 500px;
+.form {
+  margin: 2rem 0 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-

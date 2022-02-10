@@ -8,13 +8,14 @@
     <title>AuxBox</title>
 </head>
 <body>
-    <div id='loggedin'>
-        <form action="/room" method="post">
-            <button id='createroom'>Create Game</button>
+    <h1 class="title-large">AUX-BOX</h1>
+    <div id='loggedin' class="container">
+        <form action="/room" method="post" class="form">
+            <button class="button block" id='createroom'>Create Game</button>
         </form>
-        <form id="join">
-            <input name="room" autocomplete="off" type="text" required>
-            <button type="submit">Join Room</button>
+        <form id="join" class="form">
+            <input class="input block" name="room" placeholder="Enter Game Code" autocomplete="off" type="text" required>
+            <button class="button block" type="submit">Join Room</button>
           </form>
     </div>
 </body>
